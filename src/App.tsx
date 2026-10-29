@@ -2,6 +2,8 @@ import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import MapPage from './pages/MapPage';
+import Countries from './pages/Countries';
+import CountryDetail from './pages/CountryDetail';
 import NewsList from './pages/NewsList';
 import NewsArticlePage from './pages/NewsArticle';
 import Characters from './pages/Characters';
@@ -16,6 +18,8 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="map" element={<MapPage />} />
+        <Route path="countries" element={<Countries />} />
+        <Route path="countries/:id" element={<CountryDetail />} />
         <Route path="news" element={<NewsList />} />
         <Route path="news/:id" element={<NewsArticlePage />} />
         <Route path="characters" element={<Characters />} />

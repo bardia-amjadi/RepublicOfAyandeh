@@ -6,7 +6,10 @@ import charactersJson from '../data/characters.json';
 import statsJson from '../data/statistics.json';
 import mediaJson from '../data/media.json';
 import instagramJson from '../data/instagram.json';
-import type { Character, InstagramPost, MediaItem, NewsArticle, Region, StatItem } from '../types';
+import countriesJson from '../data/countries.json';
+import countryGeometry from '../data/countries.geometry.json';
+import profileJson from '../data/country.json';
+import type { Character, Country, CountryProfile, InstagramPost, MediaItem, NewsArticle, Region, StatItem } from '../types';
 import type { Geometry } from './geo';
 
 const geometries = regionGeometry as unknown as Record<string, Geometry>;
@@ -18,6 +21,17 @@ export const regions: Region[] = (regionsMeta as Omit<Region, 'geometry'>[])
     return !!geometries[r.id];
   })
   .map((r) => ({ ...r, geometry: geometries[r.id] }));
+
+/** Fictional neighbouring countries (metadata + borders). */
+export const countries: Country[] = (countriesJson as Omit<Country, 'geometry'>[])
+  .filter((c) => {
+    if (!(countryGeometry as Record<string, unknown>)[c.geometryId]) console.warn(`[content] country ${c.id} has no geometry and was skipped`);
+    return !!(countryGeometry as Record<string, unknown>)[c.geometryId];
+  })
+  .map((c) => ({ ...c, geometry: (countryGeometry as unknown as Record<string, Geometry>)[c.geometryId] }));
+
+export const profile = profileJson as CountryProfile;
+export const findCountry = (id: string | null | undefined) => countries.find((c) => c.id === id);
 
 export const outline = outlineJson as unknown as Geometry;
 

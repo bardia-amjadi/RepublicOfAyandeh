@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import NewsCard from '../components/NewsCard';
 import { news } from '../lib/content';
+import Reveal from '../components/Reveal';
 import { usePageTitle } from '../lib/usePageTitle';
 
 export default function NewsList() {
@@ -20,7 +21,7 @@ export default function NewsList() {
           {cats.map((c) => <button key={c} type="button" aria-pressed={cat === c} onClick={() => setCat(c)}>{c}</button>)}
         </div>
       )}
-      {list.length ? <div className="news-grid">{list.map((a) => <NewsCard key={a.id} article={a} />)}</div> : <p className="empty">خبری در این دسته وجود ندارد.</p>}
+      {list.length ? <div className="news-grid">{list.map((a, i) => <Reveal key={a.id} delay={(i % 3) * 80}><NewsCard article={a} /></Reveal>)}</div> : <p className="empty">خبری در این دسته وجود ندارد.</p>}
     </div>
   );
 }

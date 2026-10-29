@@ -32,6 +32,7 @@ export const site = {
 export const navigation = [
   { to: '/', label: 'خانه', labelEn: 'Home', end: true },
   { to: '/map', label: 'نقشه سیاسی', labelEn: 'Political Map', end: false },
+  { to: '/countries', label: 'کشورها', labelEn: 'Countries', end: false },
   { to: '/news', label: 'اخبار', labelEn: 'News', end: false },
   { to: '/characters', label: 'شخصیت‌ها', labelEn: 'Characters', end: false },
   { to: '/gallery', label: 'رسانه', labelEn: 'Media', end: false },

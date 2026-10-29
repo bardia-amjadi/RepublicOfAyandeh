@@ -12,7 +12,7 @@ export default function Layout() {
     <>
       <a className="skip-link" href="#content" onClick={(e) => { e.preventDefault(); document.getElementById('content')?.focus(); }}>پرش به محتوای اصلی</a>
       <Header />
-      <main id="content" tabIndex={-1}>
+      <main id="content" tabIndex={-1} key={pathname} className="page-enter">
         <Outlet />
       </main>
       <Footer />

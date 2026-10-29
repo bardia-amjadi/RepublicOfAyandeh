@@ -377,3 +377,142 @@ a.ig-post:hover { border-color: var(--red); }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .map-world { transition: none !important; }
 }
+
+/* ==========================================================================
+   Expansion: neighbouring countries, richer map, animations
+   ========================================================================== */
+:root { --sea: #0a1a1f; --sea-2: #0e2a2c; --ease: cubic-bezier(.2, .7, .2, 1); }
+
+/* sea + drifting light */
+.map {
+  background:
+    radial-gradient(ellipse at 62% 38%, rgba(31, 157, 85, .10), transparent 55%),
+    radial-gradient(ellipse at 30% 75%, rgba(215, 38, 61, .07), transparent 50%),
+    linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(180deg, var(--sea-2), var(--sea));
+}
+.map::before {
+  content: ''; position: absolute; inset: -20%; pointer-events: none; opacity: .5;
+  background: repeating-radial-gradient(circle at 20% 30%, transparent 0 46px, rgba(120, 200, 190, .05) 47px 48px);
+  animation: sea-drift 40s linear infinite;
+}
+@keyframes sea-drift { to { transform: translate3d(60px, 40px, 0); } }
+
+/* neighbour countries */
+.map-country {
+  stroke: rgba(10, 17, 14, .8); stroke-width: 1; stroke-linejoin: round; cursor: pointer; opacity: .88;
+  transition: opacity .25s, filter .25s; animation: country-in .9s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 90ms + 200ms);
+}
+.map-country:hover { opacity: 1; filter: brightness(1.2); }
+.map-country:focus { outline: none; }
+.map-country:focus-visible { stroke: var(--white); stroke-width: 3; }
+.map-countries.has-selection .map-country:not([data-selected]) { opacity: .5; }
+.map-ring-country { stroke: var(--green-text); stroke-dasharray: 8 6; animation: march 1.2s linear infinite; }
+@keyframes march { to { stroke-dashoffset: -14; } }
+@keyframes country-in { from { opacity: 0; filter: saturate(0) blur(3px); } }
+
+/* Republic: entrance sequence */
+.map-outline-fill { filter: drop-shadow(0 0 14px rgba(31, 157, 85, .35)); animation: fade-in .8s ease backwards .1s; }
+.map-region { animation: region-in .8s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 80ms + 450ms); transform-box: fill-box; transform-origin: center; }
+@keyframes region-in { from { opacity: 0; transform: scale(.94); } }
+@keyframes fade-in { from { opacity: 0; } }
+.map-outline { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 2.2s .15s var(--ease) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.map-labels { animation: fade-in .9s ease backwards 1.3s; }
+
+/* labels for countries & pings */
+.lbl-country { font-size: 12.5px; font-weight: 700; fill: #dce6df; stroke: rgba(8, 14, 11, .85); stroke-width: 3.5px; opacity: .95; text-anchor: middle; paint-order: stroke; stroke-linejoin: round; }
+.lbl-country-en { font-size: 10px; fill: #b9c8bf; stroke: rgba(8, 14, 11, .85); stroke-width: 3px; text-anchor: middle; paint-order: stroke; stroke-linejoin: round; }
+.cap-dot.country { fill: #dce6df; stroke: rgba(8, 14, 11, .8); }
+.ping { fill: none; stroke: var(--white); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ping 1.8s var(--ease) infinite; }
+@keyframes ping { from { transform: scale(1); opacity: .9; } to { transform: scale(5.5); opacity: 0; } }
+.map-controls button svg { transition: transform .25s var(--ease); }
+.map-controls button:hover:not(:disabled) svg { transform: scale(1.15); }
+
+/* side panel */
+.side-title-2 { margin-top: 1.5rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.country-list .flag-xs { width: 28px; height: 19px; border-radius: 3px; flex: none; }
+.relation { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: .6rem .8rem; font-size: .92rem; }
+.hero-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+.hero-line { display: block; animation: rise .8s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 110ms + 150ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+.hero-intro h1 .hero-line.en { display: block; }
+.hero-intro h1 .hero-line:first-child { color: var(--white); text-shadow: 0 2px 24px rgba(31, 157, 85, .35); }
+
+/* flags */
+.flag { border-radius: 6px; box-shadow: 0 6px 18px rgba(0, 0, 0, .35); width: 90px; height: auto; aspect-ratio: 3 / 2; }
+.flag-sm { width: 46px; flex: none; border-radius: 4px; }
+.flag-xs { width: 28px; border-radius: 3px; box-shadow: none; display: inline-block; vertical-align: middle; margin-inline-end: .4rem; }
+.flag-lg { width: clamp(120px, 20vw, 180px); }
+
+/* country cards */
+.country-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.1rem; }
+.country-card a {
+  position: relative; display: block; height: 100%; padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--line);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tint, #1f9d55) 18%, var(--panel)), var(--panel) 60%);
+  color: inherit; text-decoration: none; overflow: hidden; transition: transform .3s var(--ease), border-color .25s, box-shadow .3s;
+}
+.country-card a::after { content: ''; position: absolute; inset-block-start: 0; inset-inline: 0; height: 3px; background: var(--tint, var(--green)); transform: scaleX(0); transform-origin: right; transition: transform .45s var(--ease); }
+.country-card a:hover { transform: translateY(-5px); border-color: var(--tint, var(--green)); box-shadow: 0 14px 34px rgba(0, 0, 0, .35); }
+.country-card a:hover::after { transform: scaleX(1); }
+.country-card .flag { margin-bottom: .85rem; transition: transform .35s var(--ease); }
+.country-card a:hover .flag { transform: rotate(-3deg) scale(1.06); }
+.country-card h3 { font-size: 1.25rem; margin: 0 0 .3rem; }
+.country-card h3 .en { margin-top: 0; }
+.country-meta { font-size: .86rem; color: var(--muted); margin: 0 0 .5rem; }
+.country-rel { font-size: .92rem; margin: 0; }
+.country-card-own a { --tint: #1f9d55; border-color: rgba(31, 157, 85, .55); }
+
+/* country detail */
+.country-head { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; padding: 1.75rem; margin-bottom: 1.75rem; border-radius: var(--radius); border: 1px solid var(--line); background: linear-gradient(120deg, color-mix(in srgb, var(--tint, #1f9d55) 28%, var(--panel)), var(--panel) 70%); animation: rise .7s var(--ease) backwards; }
+.country-head h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 .3rem; }
+.country-head h1 .en { margin-top: .1rem; }
+.motto { color: var(--green-text); font-size: 1.15rem; margin-bottom: 1rem; }
+.fact-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .8rem; margin: 0 0 2.5rem; }
+.fact-cards > div { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: .8rem 1rem; transition: border-color .25s, transform .25s var(--ease); }
+.fact-cards > div:hover { border-color: var(--green); transform: translateY(-3px); }
+.fact-cards dt { color: var(--muted); font-size: .82rem; }
+.fact-cards dd { margin: 0; font-weight: 700; }
+.detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 2.5rem; }
+.inline-links { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none !important; padding: 0 !important; }
+.inline-links a { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem .9rem; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; color: var(--text); background: var(--panel); transition: border-color .2s, background .2s; }
+.inline-links a:hover { border-color: var(--green); background: var(--panel-2); }
+.inline-links.big { margin-bottom: 1rem; }
+
+/* timeline */
+.timeline { position: relative; display: grid; gap: 1.1rem; padding-inline-start: 1.6rem; margin: 0; }
+.timeline::before { content: ''; position: absolute; inset-block: .4rem; inset-inline-start: 5px; width: 2px; background: linear-gradient(var(--green), var(--white), var(--red)); border-radius: 2px; }
+.timeline-item { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: .9rem 1.1rem; }
+.timeline-item::before { content: ''; position: absolute; inset-inline-start: calc(-1.6rem + 1px); inset-block-start: 1.15rem; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); border: 2px solid var(--green-text); }
+.timeline-year { font-size: .8rem; color: var(--green-text); font-weight: 700; }
+.timeline-item h3 { font-size: 1.05rem; margin: .1rem 0 .2rem; }
+.timeline-item p { margin: 0; color: #cddad2; font-size: .94rem; }
+
+/* scroll reveal & page transition */
+.js .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: var(--d, 0ms); }
+.js .reveal.is-in { opacity: 1; transform: none; }
+.page-enter { animation: page-in .5s var(--ease) both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* richer hover on existing cards */
+.news-card-media img { transition: transform .6s var(--ease); }
+.news-card:hover .news-card-media img { transform: scale(1.06); }
+.character-card .portrait { transition: transform .6s var(--ease); }
+.character-card:hover .portrait { transform: scale(1.04); }
+.character-card { overflow: hidden; }
+.stat { transition: transform .3s var(--ease), border-color .25s; }
+.stat:hover { transform: translateY(-4px); border-color: var(--green); }
+.btn { transition: background .2s, border-color .2s, color .2s, transform .2s var(--ease); }
+.btn:hover { transform: translateY(-2px); }
+.section-head h2 { position: relative; padding-inline-start: 1rem; }
+.section-head h2::before { content: ''; position: absolute; inset-block: .2em; inset-inline-start: 0; width: 4px; border-radius: 4px; background: linear-gradient(var(--green) 0 33%, var(--white) 33% 66%, var(--red) 66%); }
+
+@media (max-width: 820px) {
+  .detail-cols { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal { opacity: 1; transform: none; }
+  .map-outline { stroke-dashoffset: 0; animation: none; }
+  .map::before, .ping, .map-ring-country { animation: none; }
+}

@@ -41,6 +41,8 @@ region geometry and that every referenced file exists.
 | Change the outer country outline | `src/data/outline.json` (GeoJSON geometry) |
 | Publish a news article | add an object to `src/data/news.json` + cover image in `public/assets/news/`. In `body`, a line starting with `## ` is a sub-heading |
 | Add a character | `src/data/characters.json` + portrait in `public/assets/characters/`. Add a `profile` array to give them a detail page |
+| Add / edit a **neighbouring country** | `src/data/countries.json` (info, flag colours, capital, timeline) + its borders in `src/data/countries.geometry.json` (matched by `geometryId`). Flags are drawn from data (`stripes`, `cross`, `circle`) so no image is needed |
+| Edit the Republic's own profile (government, motto, facts, timeline) | `src/data/country.json` |
 | Update statistics | `src/data/statistics.json` — fixed `value`, or `computed`: `regionCount`, `populationTotal`, `citiesTotal` (derived from regions) |
 | Add a gallery image | `src/data/media.json` + file in `public/assets/media/` (categories/filters appear automatically) |
 | Featured Instagram posts | `src/data/instagram.json` (manually maintained; no scraping or API) |
@@ -51,14 +53,18 @@ The capital's `lon`/`lat` must lie inside the region (the validator checks this)
 ## Sample data
 
 Everything bundled is clearly-labelled **sample** data: the 8 regions, news, characters, statistics and all images
-(generated SVG placeholders). Replace freely. `scripts/generate-sample-regions.py` and `scripts/generate-placeholders.py`
-(optional, Python) regenerate the samples; you do not need them to build the site.
+(generated SVG placeholders). Replace freely. `scripts/generate-sample-regions.py` and `scripts/generate-placeholders.py` and `scripts/generate-neighbors.py`
+(optional, Python; the neighbours script also needs `scipy`) regenerate the samples; you do not need them to build the site.
 
 ## Map notes
 
+- The seven neighbouring countries are **fictional**: the surrounding land is only used as an unnamed landmass and carved into invented countries. They do not represent real countries.
+- Pages: `/#/map` (Republic, zoomed in), `/#/countries` (whole world + cards), `/#/countries/<id>` (profile and timeline; `ayandeh` is the Republic). Selection is linkable: `?region=AY-03` or `?country=kavaran`.
+- Animations (map intro, scroll reveals, page transitions, pulsing selection marker) are CSS-only and switch off with the OS "reduce motion" setting.
+
 - Outer outline: Natural Earth 50m (public domain), simplified. **Internal borders are fictional** and unrelated to real provinces.
 - Drag to pan, wheel / buttons / pinch to zoom, "show whole map" button resets. On the home page the wheel zooms only with Ctrl/Cmd held so the page can still scroll.
-- Keyboard: Tab to regions, Enter/Space selects, arrow keys pan, `+`/`-` zoom, `0` resets, Esc clears. The region list beside the map and the table on the map page are non-pointer alternatives.
+- Keyboard: Tab to regions, Enter/Space selects, arrow keys pan, `+`/`-` zoom, `0` shows the Republic, `W` shows all countries, Esc clears. The region list beside the map and the table on the map page are non-pointer alternatives.
 - The map page supports deep links: `/#/map?region=AY-03`.
 
 ## Project structure

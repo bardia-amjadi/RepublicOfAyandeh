@@ -80,10 +80,28 @@ stats.forEach((s) => {
   if (s.computed && !['regionCount', 'populationTotal', 'citiesTotal'].includes(s.computed)) err(`statistics[${s.id}]: unknown computed "${s.computed}"`);
 });
 
+const countries = read('src/data/countries.json');
+const countryGeo = read('src/data/countries.geometry.json');
+uniq(countries, 'countries');
+countries.forEach((c) => {
+  const w = `countries[${c.id}]`;
+  need(c, ['id', 'geometryId', 'nameFa', 'nameEn', 'color', 'capital', 'population', 'government', 'description', 'flag'], w);
+  if (c.id && !/^[a-z0-9-]+$/.test(c.id)) err(`${w}: id must be lowercase letters, digits and dashes (used in the URL)`);
+  if (c.color && !/^#[0-9a-fA-F]{6}$/.test(c.color)) err(`${w}: color must be a #rrggbb hex value`);
+  if (c.flag && (!['stripes', 'cross', 'circle'].includes(c.flag.pattern) || !Array.isArray(c.flag.colors) || c.flag.colors.length < 2)) err(`${w}: flag needs pattern (stripes|cross|circle) and at least 2 colors`);
+  const g = countryGeo[c.geometryId];
+  if (!g) return err(`${w}: no geometry "${c.geometryId}" in countries.geometry.json`);
+  if (c.capital && !inGeometry([c.capital.lon, c.capital.lat], g)) err(`${w}: capital coordinates fall outside the country`);
+});
+
+const profile = read('src/data/country.json');
+need(profile, ['nameFa', 'nameEn', 'government', 'capitalRegionId', 'overview', 'timeline'], 'country.json');
+if (profile.capitalRegionId && !regions.some((r) => r.id === profile.capitalRegionId)) err(`country.json: capitalRegionId "${profile.capitalRegionId}" is not a region id`);
+
 for (const f of ['assets/brand/logo.svg', 'assets/brand/flag.svg']) asset(f, 'brand');
 
 if (errors.length) {
   console.error(`\nContent validation failed (${errors.length}):\n` + errors.map((e) => ` - ${e}`).join('\n') + '\n');
   process.exit(1);
 }
-console.log(`Content OK: ${regions.length} regions, ${news.length} articles, ${characters.length} characters, ${media.length} media, ${stats.length} statistics.`);
+console.log(`Content OK: ${regions.length} regions, ${news.length} articles, ${characters.length} characters, ${media.length} media, ${stats.length} statistics, ${countries.length} neighbouring countries.`);

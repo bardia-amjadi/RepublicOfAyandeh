@@ -1,27 +1,21 @@
-import { useSearchParams } from 'react-router-dom';
 import MapExplorer from '../components/MapExplorer';
-import { findRegion, regions } from '../lib/content';
+import { regions } from '../lib/content';
 import { usePageTitle } from '../lib/usePageTitle';
 import { faNumber } from '../lib/format';
+import { useMapSelection } from '../lib/useMapSelection';
 
 export default function MapPage() {
   usePageTitle('نقشه سیاسی');
-  const [params, setParams] = useSearchParams();
-  const selected = findRegion(params.get('region'))?.id ?? null;
-  const onSelect = (id: string | null) => {
-    const next = new URLSearchParams(params);
-    if (id) next.set('region', id); else next.delete('region');
-    setParams(next, { replace: true });
-  };
+  const sel = useMapSelection();
 
   return (
     <>
       <div className="container page-head">
         <h1>نقشه سیاسی <span className="en" lang="en" dir="ltr">Political Map</span></h1>
-        <p>نقشه تعاملی نواحی جمهوری آینده. با کشیدن جابه‌جا کنید، با چرخ ماوس یا دکمه‌ها بزرگ‌نمایی کنید و برای دیدن جزئیات روی یک ناحیه بزنید.</p>
+        <p>نقشه تعاملی نواحی جمهوری آینده و کشورهای همسایه. با کشیدن جابه‌جا کنید، با چرخ ماوس یا دکمه‌ها بزرگ‌نمایی کنید و برای دیدن جزئیات روی یک ناحیه یا کشور بزنید.</p>
       </div>
       <section className="map-page" aria-label="نقشه">
-        <MapExplorer selectedId={selected} onSelect={onSelect} variant="page" />
+        <MapExplorer selectedId={sel.region} onSelect={sel.selectRegion} selectedCountryId={sel.country} onSelectCountry={sel.selectCountry} variant="page" />
       </section>
       <section className="section" aria-labelledby="table-title">
         <div className="container">
@@ -33,10 +27,10 @@ export default function MapPage() {
               </thead>
               <tbody>
                 {regions.map((r) => (
-                  <tr key={r.id} data-active={r.id === selected || undefined}>
+                  <tr key={r.id} data-active={r.id === sel.region || undefined}>
                     <td dir="ltr">{r.id}</td>
                     <th scope="row">
-                      <button type="button" className="link-btn" onClick={() => onSelect(r.id)}>
+                      <button type="button" className="link-btn" onClick={() => sel.selectRegion(r.id)}>
                         <span className="swatch" style={{ background: r.color }} aria-hidden="true" />
                         {r.nameFa} <span className="en" lang="en" dir="ltr">{r.nameEn}</span>
                       </button>

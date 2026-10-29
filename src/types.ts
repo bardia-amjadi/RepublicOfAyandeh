@@ -80,3 +80,51 @@ export interface InstagramPost {
   caption?: string;
   url?: string;
 }
+
+export interface TimelineEntry { year: string; title: string; text: string }
+
+export interface FlagSpec {
+  pattern: 'stripes' | 'cross' | 'circle';
+  colors: string[];
+}
+
+/** A fictional neighbouring country (src/data/countries.json + countries.geometry.json). */
+export interface Country {
+  id: string;
+  /** Key into countries.geometry.json */
+  geometryId: string;
+  nameFa: string;
+  nameEn: string;
+  color: string;
+  flag: FlagSpec;
+  capital: Capital;
+  population: number;
+  areaKm2: number;
+  government: string;
+  language: string;
+  currency: string;
+  relation: string;
+  description: string;
+  timeline: TimelineEntry[];
+  sample?: boolean;
+  geometry: Geometry;
+}
+
+/** Profile of the Republic of Ayandeh itself (src/data/country.json). */
+export interface CountryProfile {
+  nameFa: string;
+  nameEn: string;
+  motto: string;
+  mottoEn?: string;
+  government: string;
+  head: string;
+  capitalRegionId: string;
+  language: string;
+  currency: string;
+  founded: string;
+  areaKm2: number;
+  overview: string[];
+  facts: { label: string; value: string }[];
+  timeline: TimelineEntry[];
+  sample?: boolean;
+}

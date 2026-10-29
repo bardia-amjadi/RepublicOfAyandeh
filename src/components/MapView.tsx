@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent as RPointerEvent } from 'react';
-import type { Region } from '../types';
+import type { Country, Region } from '../types';
 import { boundsOf, geometryToPath, makeProjection, polygonsOf } from '../lib/geo';
 import type { Geometry } from '../lib/geo';
 import { faNumber } from '../lib/format';
@@ -10,13 +10,20 @@ const MIN_K = 1;
 const MAX_K = 14;
 
 interface View { k: number; x: number; y: number }
-const HOME: View = { k: 1, x: 0, y: 0 };
+const WORLD: View = { k: 1, x: 0, y: 0 };
+interface Box { cx: number; cy: number; w: number; h: number }
 
 interface Props {
   regions: Region[];
   outline: Geometry;
+  /** Fictional neighbouring countries drawn around the Republic. */
+  countries?: Country[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  selectedCountryId?: string | null;
+  onSelectCountry?: (id: string | null) => void;
+  /** Start zoomed on the Republic ('own') or showing every country ('world'). */
+  initialFit?: 'own' | 'world';
   /** 'ctrl' = the mouse wheel only zooms while Ctrl/Cmd is held, so the page can still scroll. */
   wheelZoom?: 'always' | 'ctrl';
   /** Zoom to a region when it becomes selected, and back out when it is cleared. */
@@ -24,39 +31,56 @@ interface Props {
   className?: string;
 }
 
-export default function MapView({ regions, outline, selectedId, onSelect, wheelZoom = 'always', zoomOnSelect = false, className = '' }: Props) {
+export default function MapView({ regions, outline, countries = [], selectedId, onSelect, selectedCountryId = null, onSelectCountry, initialFit = 'own', wheelZoom = 'always', zoomOnSelect = false, className = '' }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   // ---- geometry → SVG paths (computed once per data set) ----
   const geo = useMemo(() => {
-    const b = boundsOf([outline, ...regions.map((r) => r.geometry)]);
+    const b = boundsOf([outline, ...regions.map((r) => r.geometry), ...countries.map((c) => c.geometry)]);
     const { project, height } = makeProjection(b, W, 24);
-    const paths: Record<string, string> = {};
-    const boxes: Record<string, { cx: number; cy: number; w: number; h: number }> = {};
-    const caps: Record<string, [number, number]> = {};
-    for (const r of regions) {
-      paths[r.id] = geometryToPath(r.geometry, project);
+    const bbox = (g: Geometry): Box => {
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-      for (const poly of polygonsOf(r.geometry))
+      for (const poly of polygonsOf(g))
         for (const [lon, lat] of poly[0]) {
           const [x, y] = project(lon, lat);
           x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
         }
-      boxes[r.id] = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 };
+      return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 };
+    };
+    const paths: Record<string, string> = {};
+    const boxes: Record<string, Box> = {};
+    const caps: Record<string, [number, number]> = {};
+    const cpaths: Record<string, string> = {};
+    const cboxes: Record<string, Box> = {};
+    const ccaps: Record<string, [number, number]> = {};
+    for (const r of regions) {
+      paths[r.id] = geometryToPath(r.geometry, project);
+      boxes[r.id] = bbox(r.geometry);
       caps[r.id] = project(r.capital.lon, r.capital.lat);
     }
-    return { H: height, outlinePath: geometryToPath(outline, project), paths, boxes, caps };
-  }, [regions, outline]);
+    for (const c of countries) {
+      cpaths[c.id] = geometryToPath(c.geometry, project);
+      cboxes[c.id] = bbox(c.geometry);
+      ccaps[c.id] = project(c.capital.lon, c.capital.lat);
+    }
+    return { H: height, outlinePath: geometryToPath(outline, project), paths, boxes, caps, cpaths, cboxes, ccaps, ownBox: bbox(outline) };
+  }, [regions, outline, countries]);
   const H = geo.H;
 
   // ---- view state (zoom/pan) ----
-  const [view, setViewState] = useState<View>(HOME);
-  const viewRef = useRef<View>(HOME);
+  const fitBox = (b: Box, pad: number, maxK: number): View => {
+    const k = Math.min(maxK, Math.max(1, Math.min(W / (b.w * pad), H / (b.h * pad))));
+    return { k, x: W / 2 - b.cx * k, y: H / 2 - b.cy * k };
+  };
+  const homeView = useMemo<View>(() => (countries.length ? fitBox(geo.ownBox, 1.12, 6) : WORLD), [geo, countries.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  const startView = initialFit === 'world' ? WORLD : homeView;
+  const [view, setViewState] = useState<View>(startView);
+  const viewRef = useRef<View>(startView);
   const [animate, setAnimate] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [scale, setScale] = useState(0.8); // screen px per SVG unit
-  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [hover, setHover] = useState<{ id: string; kind: 'region' | 'country'; x: number; y: number } | null>(null);
   const [hint, setHint] = useState(false);
 
   const clampView = (v: View): View => {
@@ -80,7 +104,8 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
     return { k, x: cx - (cx - v.x) * f, y: cy - (cy - v.y) * f };
   };
   const zoomBy = (factor: number) => setView(zoomAt(viewRef.current, factor, W / 2, H / 2), true);
-  const reset = () => setView(HOME, true);
+  const reset = () => setView(homeView, true);
+  const showWorld = () => setView(WORLD, true);
 
   /** client px → SVG units (before the zoom transform) */
   const toUnits = (clientX: number, clientY: number) => {
@@ -130,21 +155,18 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wheelZoom, H]);
 
-  // zoom to the selected region (map page)
-  const prevSelected = useRef<string | null>(null);
+  // zoom to the selected region / country (map pages)
+  const prevSel = useRef<string | null>(null);
   useEffect(() => {
+    const key = selectedId ? `r:${selectedId}` : selectedCountryId ? `c:${selectedCountryId}` : null;
     if (zoomOnSelect) {
-      const box = selectedId ? geo.boxes[selectedId] : undefined;
-      if (box) {
-        const k = Math.min(6, Math.max(1.2, Math.min(W / (box.w * 1.5), H / (box.h * 1.5))));
-        setView({ k, x: W / 2 - box.cx * k, y: H / 2 - box.cy * k }, true);
-      } else if (prevSelected.current && !selectedId) {
-        setView(HOME, true);
-      }
+      const box = selectedId ? geo.boxes[selectedId] : selectedCountryId ? geo.cboxes[selectedCountryId] : undefined;
+      if (box) setView(fitBox(box, 1.5, 6), true);
+      else if (prevSel.current && !key) setView(startView, true);
     }
-    prevSelected.current = selectedId;
+    prevSel.current = key;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, zoomOnSelect]);
+  }, [selectedId, selectedCountryId, zoomOnSelect]);
 
   // ---- pointer gestures: drag to pan, pinch to zoom, click to select ----
   const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -206,28 +228,34 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
       case '+': case '=': zoomBy(1.4); break;
       case '-': case '_': zoomBy(1 / 1.4); break;
       case '0': reset(); break;
+      case 'w': case 'W': showWorld(); break;
       case 'ArrowLeft': setView({ ...v, x: v.x + step }); break;
       case 'ArrowRight': setView({ ...v, x: v.x - step }); break;
       case 'ArrowUp': setView({ ...v, y: v.y + step }); break;
       case 'ArrowDown': setView({ ...v, y: v.y - step }); break;
-      case 'Escape': if (selectedId) onSelect(null); else handled = false; break;
+      case 'Escape': if (selectedId) onSelect(null); else if (selectedCountryId && onSelectCountry) onSelectCountry(null); else handled = false; break;
       default: handled = false;
     }
     if (handled) e.preventDefault();
   };
 
   // ---- hover / focus tooltip ----
-  const showTip = (id: string, clientX: number, clientY: number) => {
+  const showTip = (id: string, kind: 'region' | 'country', clientX: number, clientY: number) => {
     const rect = wrapRef.current?.getBoundingClientRect();
     if (!rect) return;
-    setHover({ id, x: clientX - rect.left, y: clientY - rect.top });
+    setHover({ id, kind, x: clientX - rect.left, y: clientY - rect.top });
   };
 
   const { k } = view;
   const showEn = k >= 1.6 || scale >= 0.9;
   const showCapital = k >= 2.4;
-  const hoverRegion = hover ? regions.find((r) => r.id === hover.id) : undefined;
+  const hoverRegion = hover?.kind === 'region' ? regions.find((r) => r.id === hover.id) : undefined;
+  const hoverCountry = hover?.kind === 'country' ? countries.find((c) => c.id === hover.id) : undefined;
   const selected = regions.find((r) => r.id === selectedId);
+  const selectedCountry = countries.find((c) => c.id === selectedCountryId);
+  const strokeW = (px: number) => px / (k * scale);
+
+  const selectCountry = (id: string) => onSelectCountry?.(id === selectedCountryId ? null : id);
 
   return (
     <div
@@ -241,30 +269,64 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
         className="map-svg"
         viewBox={`0 0 ${W} ${H}`}
         role="group"
-        aria-label="نقشه تعاملی جمهوری آینده"
+        aria-label="نقشه تعاملی جمهوری آینده و کشورهای همسایه"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
         onPointerLeave={() => setHover(null)}
       >
-        <title>نقشه تعاملی نواحی خیالی جمهوری آینده</title>
-        <desc>هر ناحیه را می‌توان با ماوس، لمس یا صفحه‌کلید انتخاب کرد. مرزهای داخلی خیالی‌اند.</desc>
+        <title>نقشه تعاملی جمهوری آینده و کشورهای خیالی همسایه</title>
+        <desc>هر ناحیه و هر کشور را می‌توان با ماوس، لمس یا صفحه‌کلید انتخاب کرد. مرزهای داخلی و کشورهای همسایه خیالی‌اند.</desc>
         <g
           className="map-world"
           style={{
             transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})`,
             transformOrigin: '0 0',
-            transition: animate ? 'transform .5s cubic-bezier(.2,.7,.2,1)' : 'none',
+            transition: animate ? 'transform .6s cubic-bezier(.2,.7,.2,1)' : 'none',
           }}
         >
+          {countries.length > 0 && (
+            <g className={selectedCountry ? 'map-countries has-selection' : 'map-countries'}>
+              {countries.map((c, i) => (
+                <path
+                  key={c.id}
+                  d={geo.cpaths[c.id]}
+                  className="map-country"
+                  style={{ ['--i' as string]: i }}
+                  fill={c.color}
+                  data-selected={c.id === selectedCountryId || undefined}
+                  vectorEffect="non-scaling-stroke"
+                  tabIndex={onSelectCountry ? 0 : -1}
+                  role="button"
+                  aria-pressed={c.id === selectedCountryId}
+                  aria-label={`کشور ${c.nameFa} (${c.nameEn})، پایتخت ${c.capital.nameFa}، جمعیت ${faNumber(c.population)} نفر`}
+                  onClick={() => { if (!moved.current) selectCountry(c.id); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectCountry(c.id); }
+                  }}
+                  onPointerEnter={(e) => e.pointerType !== 'touch' && !dragging && showTip(c.id, 'country', e.clientX, e.clientY)}
+                  onPointerMove={(e) => e.pointerType !== 'touch' && !gesture.current?.dragging && showTip(c.id, 'country', e.clientX, e.clientY)}
+                  onPointerLeave={() => setHover((h) => (h?.id === c.id ? null : h))}
+                  onFocus={(e) => {
+                    const b = e.currentTarget.getBoundingClientRect();
+                    showTip(c.id, 'country', b.left + b.width / 2, b.top + b.height / 2);
+                  }}
+                  onBlur={() => setHover((h) => (h?.id === c.id ? null : h))}
+                />
+              ))}
+            </g>
+          )}
+          {selectedCountry && <path d={geo.cpaths[selectedCountry.id]} className="map-ring map-ring-country" vectorEffect="non-scaling-stroke" />}
+
           <path d={geo.outlinePath} className="map-outline-fill" />
           <g className={selected ? 'map-regions has-selection' : 'map-regions'}>
-            {regions.map((r) => (
+            {regions.map((r, i) => (
               <path
                 key={r.id}
                 d={geo.paths[r.id]}
                 className="map-region"
+                style={{ ['--i' as string]: i }}
                 fill={r.color}
                 data-selected={r.id === selectedId || undefined}
                 vectorEffect="non-scaling-stroke"
@@ -282,25 +344,39 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
                     onSelect(r.id === selectedId ? null : r.id);
                   }
                 }}
-                onPointerEnter={(e) => e.pointerType !== 'touch' && !dragging && showTip(r.id, e.clientX, e.clientY)}
-                onPointerMove={(e) => e.pointerType !== 'touch' && !gesture.current?.dragging && showTip(r.id, e.clientX, e.clientY)}
+                onPointerEnter={(e) => e.pointerType !== 'touch' && !dragging && showTip(r.id, 'region', e.clientX, e.clientY)}
+                onPointerMove={(e) => e.pointerType !== 'touch' && !gesture.current?.dragging && showTip(r.id, 'region', e.clientX, e.clientY)}
                 onPointerLeave={() => setHover((h) => (h?.id === r.id ? null : h))}
                 onFocus={(e) => {
                   const b = e.currentTarget.getBoundingClientRect();
-                  showTip(r.id, b.left + b.width / 2, b.top + b.height / 2);
+                  showTip(r.id, 'region', b.left + b.width / 2, b.top + b.height / 2);
                 }}
                 onBlur={() => setHover((h) => (h?.id === r.id ? null : h))}
               />
             ))}
           </g>
           {selected && <path d={geo.paths[selected.id]} className="map-ring" vectorEffect="non-scaling-stroke" />}
-          <path d={geo.outlinePath} className="map-outline" vectorEffect="non-scaling-stroke" />
+          <path d={geo.outlinePath} className="map-outline" pathLength={1} strokeWidth={strokeW(1.8)} />
 
           <g className="map-labels" aria-hidden="true">
+            {countries.map((c) => {
+              const [px, py] = geo.ccaps[c.id];
+              const active = c.id === selectedCountryId;
+              return (
+                <g key={c.id} className="lbl-group lbl-group-country" transform={`translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(${(1 / (k * scale)).toFixed(4)})`}>
+                  {active && <circle r="4" className="ping" />}
+                  <circle r="2.6" className="cap-dot country" />
+                  <text y="-9" className="lbl lbl-country">{c.nameFa}</text>
+                  {(showEn || active) && <text y="17" className="lbl lbl-country-en">{c.nameEn}</text>}
+                </g>
+              );
+            })}
             {regions.map((r) => {
               const [px, py] = geo.caps[r.id];
+              const active = r.id === selectedId;
               return (
-                <g key={r.id} transform={`translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(${(1 / (k * scale)).toFixed(4)})`}>
+                <g key={r.id} className="lbl-group" transform={`translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(${(1 / (k * scale)).toFixed(4)})`}>
+                  {active && <circle r="4" className="ping" />}
                   <circle r="3.6" className={`cap-dot ${r.textTone}`} />
                   <text y="-10" className={`lbl lbl-fa ${r.textTone}`}>{r.nameFa}</text>
                   {showEn && <text y="21" className={`lbl lbl-en ${r.textTone}`}>{r.nameEn}</text>}
@@ -312,11 +388,22 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
         </g>
       </svg>
 
-      {hoverRegion && hover && !dragging && (
+      {hover && !dragging && (hoverRegion || hoverCountry) && (
         <div className="map-tooltip" role="tooltip" style={{ left: hover.x, top: hover.y }}>
-          <strong>{hoverRegion.nameFa}</strong>
-          <span lang="en" dir="ltr">{hoverRegion.nameEn}</span>
-          <small>جمعیت: {faNumber(hoverRegion.population)}</small>
+          {hoverRegion && (
+            <>
+              <strong>{hoverRegion.nameFa}</strong>
+              <span lang="en" dir="ltr">{hoverRegion.nameEn}</span>
+              <small>جمعیت: {faNumber(hoverRegion.population)}</small>
+            </>
+          )}
+          {hoverCountry && (
+            <>
+              <strong>{hoverCountry.nameFa}</strong>
+              <span lang="en" dir="ltr">{hoverCountry.nameEn}</span>
+              <small>پایتخت: {hoverCountry.capital.nameFa}</small>
+            </>
+          )}
         </div>
       )}
 
@@ -327,14 +414,19 @@ export default function MapView({ regions, outline, selectedId, onSelect, wheelZ
         <button type="button" onClick={() => zoomBy(1 / 1.5)} aria-label="کوچک‌نمایی" title="کوچک‌نمایی (-)" disabled={k <= MIN_K + 0.01}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
         </button>
-        <button type="button" onClick={reset} aria-label="نمایش کل نقشه" title="نمایش کل نقشه (0)">
+        <button type="button" onClick={reset} aria-label="نمایش جمهوری آینده" title="نمایش جمهوری آینده (0)">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
         </button>
+        {countries.length > 0 && (
+          <button type="button" onClick={showWorld} aria-label="نمایش همه کشورها" title="نمایش همه کشورها (W)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" /></svg>
+          </button>
+        )}
       </div>
 
       <p className="map-hint" data-visible={hint || undefined} aria-hidden={!hint}>برای بزرگ‌نمایی، کلید Ctrl را نگه دارید و چرخ ماوس را بچرخانید</p>
       <p className="sr-only">
-        راهنمای صفحه‌کلید: با Tab بین نواحی حرکت کنید، با Enter یا فاصله ناحیه را انتخاب کنید، با کلیدهای جهت‌دار نقشه را جابه‌جا کنید، با + و - بزرگ‌نمایی و با ۰ بازنشانی کنید و با Escape انتخاب را بردارید.
+        راهنمای صفحه‌کلید: با Tab بین نواحی و کشورها حرکت کنید، با Enter یا فاصله انتخاب کنید، با کلیدهای جهت‌دار نقشه را جابه‌جا کنید، با + و - بزرگ‌نمایی، با ۰ نمایش جمهوری آینده، با W نمایش همه کشورها و با Escape انتخاب را بردارید.
       </p>
     </div>
   );

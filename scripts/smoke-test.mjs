@@ -10,12 +10,13 @@ const vite = await createServer({ server: { middlewareMode: true }, appType: 'cu
 const App = (await vite.ssrLoadModule('/src/App.tsx')).default;
 const content = await vite.ssrLoadModule('/src/lib/content.ts');
 
-const routes = ['/', '/map', '/map?region=AY-03', '/news', '/characters', '/gallery', '/about', '/does-not-exist'];
+const routes = ['/', '/map', '/map?region=AY-03', '/map?country=kavaran', '/countries', '/countries?country=orasan', '/countries/ayandeh', '/countries/nope', '/news', '/characters', '/gallery', '/about', '/does-not-exist'];
 content.news.forEach((n) => routes.push(`/news/${n.id}`));
 content.characters.filter((c) => c.profile).forEach((c) => routes.push(`/characters/${c.id}`));
 routes.push('/news/nope', '/characters/sample-b');
 
-const known = new Set(['/', '/map', '/news', '/characters', '/gallery', '/about']);
+const known = new Set(['/', '/map', '/news', '/characters', '/gallery', '/about', '/countries', '/countries/ayandeh']);
+content.countries.forEach((c) => { known.add(`/countries/${c.id}`); routes.push(`/countries/${c.id}`); });
 content.news.forEach((n) => known.add(`/news/${n.id}`));
 content.characters.filter((c) => c.profile).forEach((c) => known.add(`/characters/${c.id}`));
 
@@ -46,6 +47,8 @@ for (const r of routes) {
 // region selection renders the panel
 const sel = renderToString(React.createElement(MemoryRouter, { initialEntries: ['/map?region=AY-03'] }, React.createElement(App)));
 if (!sel.includes('region-panel')) fail('/map?region=AY-03 did not render the detail panel');
+const csel = renderToString(React.createElement(MemoryRouter, { initialEntries: ['/map?country=kavaran'] }, React.createElement(App)));
+if (!csel.includes('country-title')) fail('/map?country=kavaran did not render the country panel');
 await vite.close();
 if (failures) { console.error(`\n${failures} failure(s)`); process.exit(1); }
 console.log('\nAll route checks passed.');

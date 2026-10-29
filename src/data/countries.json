@@ -1,0 +1,107 @@
+[
+  {
+    "id": "kavaran", "geometryId": "C-01",
+    "nameFa": "کاوران", "nameEn": "Kavaran", "color": "#5f7a8c",
+    "flag": { "pattern": "cross", "colors": ["#2f5d8a", "#f2f2f2"] },
+    "capital": { "nameFa": "کاوشهر", "nameEn": "Kavshahr", "lon": 40.0, "lat": 39.69 },
+    "population": 11800000, "areaKm2": 412000,
+    "government": "جمهوری پارلمانی", "language": "کاورانی (با فارسی به‌عنوان زبان دوم)", "currency": "دینار کاورانی",
+    "relation": "همسایه غربی؛ شریک تجاری قدیمی",
+    "description": "کشوری کوهستانی در شمال‌غرب با گذرگاه‌های تاریخی و بازارهای کهن. کاوران پلی میان جمهوری آینده و دریاهای غربی است.",
+    "timeline": [
+      { "year": "سال ۱۱۲", "title": "تأسیس کاوران", "text": "اتحاد قبایل کوهستانی و اعلام نخستین قانون اساسی." },
+      { "year": "سال ۱۷۴", "title": "پیمان گذرگاه", "text": "امضای پیمان تجاری با جمهوری آینده درباره گذرگاه‌های شمال‌غرب." }
+    ],
+    "sample": true
+  },
+  {
+    "id": "orasan", "geometryId": "C-02",
+    "nameFa": "اوراسان", "nameEn": "Orasan", "color": "#7b6f8f",
+    "flag": { "pattern": "stripes", "colors": ["#7b4fa3", "#f2f2f2", "#2a2a3a"] },
+    "capital": { "nameFa": "اورا", "nameEn": "Ora", "lon": 45.93, "lat": 42.18 },
+    "population": 8400000, "areaKm2": 296000,
+    "government": "جمهوری نیمه‌ریاستی", "language": "اوراسانی", "currency": "کرون اوراسانی",
+    "relation": "همسایه شمالی؛ همکار در مدیریت دریای مشترک",
+    "description": "سرزمین دشت‌ها و جنگل‌های سرد در شمال. اقتصاد اوراسان بر چوب، ماهی و انرژی بنا شده است.",
+    "timeline": [
+      { "year": "سال ۹۸", "title": "یکپارچه‌شدن دشت‌ها", "text": "شهرهای مستقل شمال زیر پرچم واحد گرد آمدند." },
+      { "year": "سال ۱۹۰", "title": "منشور دریا", "text": "توافق با همسایگان درباره صید و کشتیرانی." }
+    ],
+    "sample": true
+  },
+  {
+    "id": "aryanush", "geometryId": "C-03",
+    "nameFa": "آریانوش", "nameEn": "Aryanush", "color": "#8a7f5c",
+    "flag": { "pattern": "circle", "colors": ["#c9a227", "#1d3b2a"] },
+    "capital": { "nameFa": "نوش‌آباد", "nameEn": "Nushabad", "lon": 63.54, "lat": 40.95 },
+    "population": 15200000, "areaKm2": 640000,
+    "government": "فدراسیون", "language": "آریانوشی", "currency": "سکه آریانوشی",
+    "relation": "همسایه شمال‌شرقی؛ مسیر کاروان‌های ابریشم",
+    "description": "فدراسیونی از دشت‌های پهناور و شهرهای کاروانی. جاده‌های آریانوش از قدیم شرق و غرب را به هم می‌رسانند.",
+    "timeline": [
+      { "year": "سال ۷۵", "title": "نخستین کاروان بزرگ", "text": "آغاز تجارت منظم میان شرق و غرب." },
+      { "year": "سال ۲۱۰", "title": "پیمان فدرال", "text": "ایالت‌ها در یک فدراسیون یکپارچه شدند." }
+    ],
+    "sample": true
+  },
+  {
+    "id": "kushandasht", "geometryId": "C-04",
+    "nameFa": "کوشان‌دشت", "nameEn": "Kushandasht", "color": "#7c8a6a",
+    "flag": { "pattern": "stripes", "colors": ["#3a5a40", "#d8c99b", "#8f2b3a"] },
+    "capital": { "nameFa": "کوشانگاه", "nameEn": "Kushangah", "lon": 66.5, "lat": 36.09 },
+    "population": 19600000, "areaKm2": 523000,
+    "government": "جمهوری ریاستی", "language": "کوشانی", "currency": "سکه کوشانی",
+    "relation": "همسایه شرقی؛ مناسبات فرهنگی نزدیک",
+    "description": "سرزمینی کوهستانی با دره‌های حاصلخیز در شرق. فرهنگ موسیقی و صنایع‌دستی کوشان‌دشت در منطقه شناخته‌شده است.",
+    "timeline": [
+      { "year": "سال ۶۰", "title": "تأسیس شهر کوشانگاه", "text": "شهر در چهارراه کوهستانی بنا شد." },
+      { "year": "سال ۱۸۸", "title": "جشنواره سالانه", "text": "نخستین جشنواره فرهنگی مشترک با جمهوری آینده." }
+    ],
+    "sample": true
+  },
+  {
+    "id": "sandrud", "geometryId": "C-05",
+    "nameFa": "سندرود", "nameEn": "Sandrud", "color": "#9a7b62",
+    "flag": { "pattern": "stripes", "colors": ["#c76d2b", "#f2f2f2", "#1f6f5c"] },
+    "capital": { "nameFa": "سند‌بندر", "nameEn": "Sandbandar", "lon": 66.89, "lat": 26.29 },
+    "population": 22400000, "areaKm2": 480000,
+    "government": "جمهوری فدرال", "language": "سندی", "currency": "روپیه سندی",
+    "relation": "همسایه جنوب‌شرقی؛ همکاری بندری",
+    "description": "کشوری ساحلی و پرجمعیت در جنوب‌شرق با بندرهای شلوغ و رودهای پهناور.",
+    "timeline": [
+      { "year": "سال ۱۳۰", "title": "گشایش بندر بزرگ", "text": "بزرگ‌ترین بندر منطقه به بهره‌برداری رسید." },
+      { "year": "سال ۲۰۱", "title": "پیمان بندرها", "text": "توافق مشترک با جمهوری آینده برای مسیرهای دریایی." }
+    ],
+    "sample": true
+  },
+  {
+    "id": "zarinrud", "geometryId": "C-06",
+    "nameFa": "زرین‌رود", "nameEn": "Zarinrud", "color": "#6f8f86",
+    "flag": { "pattern": "stripes", "colors": ["#2a7f6f", "#f2f2f2", "#b8892b"] },
+    "capital": { "nameFa": "زرین‌شهر", "nameEn": "Zarinshahr", "lon": 41.14, "lat": 32.69 },
+    "population": 24800000, "areaKm2": 435000,
+    "government": "جمهوری پارلمانی", "language": "زرینی", "currency": "دینار زرینی",
+    "relation": "همسایه غربی؛ حوضه آبی مشترک",
+    "description": "سرزمین دو رود و دشت‌های غله در غرب. زرین‌رود با جمهوری آینده حوضه آبی مشترک دارد.",
+    "timeline": [
+      { "year": "سال ۴۰", "title": "نخستین شهرها", "text": "شهرنشینی در کرانه رودها آغاز شد." },
+      { "year": "سال ۱۶۵", "title": "پیمان آب", "text": "تقسیم عادلانه آب با همسایگان." }
+    ],
+    "sample": true
+  },
+  {
+    "id": "parlian", "geometryId": "C-07",
+    "nameFa": "پرلیان", "nameEn": "Parlian", "color": "#a08c6a",
+    "flag": { "pattern": "circle", "colors": ["#2f7d4a", "#f2f2f2"] },
+    "capital": { "nameFa": "پرلیان‌شهر", "nameEn": "Parlianshahr", "lon": 43.86, "lat": 25.19 },
+    "population": 9300000, "areaKm2": 1450000,
+    "government": "سلطنت مشروطه", "language": "پرلیانی", "currency": "ریال پرلیانی",
+    "relation": "همسایه جنوبی؛ بر ساحل خلیج",
+    "description": "پهناورترین کشور منطقه؛ سرزمینی صحرایی با شهرهای ساحلی و ثروت بندری.",
+    "timeline": [
+      { "year": "سال ۸۰", "title": "نخستین بندر", "text": "تجارت دریایی پایه‌گذار ثروت کشور شد." },
+      { "year": "سال ۱۹۵", "title": "قانون اساسی", "text": "سلطنت مشروطه اعلام شد." }
+    ],
+    "sample": true
+  }
+]
