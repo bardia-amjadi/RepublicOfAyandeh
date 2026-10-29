@@ -1,0 +1,7 @@
+[
+  { "id": "population", "label": "جمعیت کل", "labelEn": "Total population", "computed": "populationTotal", "note": "مجموع جمعیت نواحی (خیالی)" },
+  { "id": "regions", "label": "نواحی اداری", "labelEn": "Administrative regions", "computed": "regionCount" },
+  { "id": "cities", "label": "شهرها", "labelEn": "Cities", "computed": "citiesTotal" },
+  { "id": "literacy", "label": "نرخ سواد", "labelEn": "Literacy rate", "value": 97, "suffix": "٪", "note": "شاخص خیالی" },
+  { "id": "universities", "label": "دانشگاه‌ها", "labelEn": "Universities", "value": 42, "note": "شاخص خیالی" }
+]

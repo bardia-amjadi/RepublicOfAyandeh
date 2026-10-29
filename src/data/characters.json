@@ -1,0 +1,43 @@
+[
+  {
+    "id": "sample-a",
+    "nameFa": "شخصیت نمونه الف",
+    "nameEn": "Sample Character A",
+    "role": "مقام نمونه — جایگزین شود",
+    "portrait": "assets/characters/portrait-1.svg",
+    "bio": "این یک کارت نمونه است و به شخصیت رسمی پروژه اشاره نمی‌کند. نام، سمت و زندگی‌نامه را در فایل characters.json جایگزین کنید.",
+    "affiliation": "وابستگی نمونه",
+    "profile": [
+      "صفحه شخصیت‌ها یک پروفایل تفصیلی اختیاری دارد. اگر فیلد profile را پر کنید، کارت به این صفحه لینک می‌شود.",
+      "همه اطلاعات این صفحه نمونه‌اند و جزء داستان رسمی نیستند."
+    ],
+    "sample": true
+  },
+  {
+    "id": "sample-b",
+    "nameFa": "شخصیت نمونه ب",
+    "nameEn": "Sample Character B",
+    "role": "مقام نمونه — جایگزین شود",
+    "portrait": "assets/characters/portrait-2.svg",
+    "bio": "کارت نمونه دوم؛ این شخصیت پروفایل تفصیلی ندارد و فقط به صورت کارت نمایش داده می‌شود.",
+    "sample": true
+  },
+  {
+    "id": "sample-c",
+    "nameFa": "شخصیت نمونه ج",
+    "role": "مقام نمونه — جایگزین شود",
+    "portrait": "assets/characters/portrait-3.svg",
+    "bio": "نام انگلیسی و وابستگی سیاسی اختیاری‌اند؛ این کارت هیچ‌کدام را ندارد.",
+    "sample": true
+  },
+  {
+    "id": "sample-d",
+    "nameFa": "شخصیت نمونه د",
+    "nameEn": "Sample Character D",
+    "role": "مقام نمونه — جایگزین شود",
+    "portrait": "assets/characters/portrait-4.svg",
+    "bio": "کارت نمونه چهارم برای نمایش چیدمان شبکه شخصیت‌ها.",
+    "affiliation": "وابستگی نمونه",
+    "sample": true
+  }
+]

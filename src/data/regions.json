@@ -1,0 +1,50 @@
+[
+  {
+    "id": "AY-01", "nameFa": "کوهسار", "nameEn": "Kuhsar", "color": "#1d7a50", "textTone": "light",
+    "population": 4820000, "cities": 14, "sample": true,
+    "capital": { "nameFa": "کوه‌آباد", "nameEn": "Kuhabad", "lon": 46.62, "lat": 37.55 },
+    "description": "ناحیه‌ای کوهستانی در شمال‌غرب جمهوری آینده با زمستان‌های سرد و دره‌های سرسبز. (داده نمونه — برای جایگزینی با اطلاعات واقعی پروژه.)"
+  },
+  {
+    "id": "AY-02", "nameFa": "دریابند", "nameEn": "Daryaband", "color": "#2f9b78", "textTone": "light",
+    "population": 6310000, "cities": 21, "sample": true,
+    "capital": { "nameFa": "ساحل‌شهر", "nameEn": "Sahelshahr", "lon": 51.53, "lat": 36.24 },
+    "description": "ناحیه ساحلی و مرطوب شمال با جنگل‌های انبوه و شالیزارها؛ مرکز گردشگری و کشاورزی جمهوری. (داده نمونه.)"
+  },
+  {
+    "id": "AY-03", "nameFa": "سپیدار", "nameEn": "Sepidar", "color": "#b92f42", "textTone": "light",
+    "population": 5240000, "cities": 17, "sample": true,
+    "capital": { "nameFa": "سپیدشهر", "nameEn": "Sepidshahr", "lon": 57.73, "lat": 36.32 },
+    "description": "دشت‌های پهناور شمال‌شرق با فرهنگ دیرپای کاروان‌سرایی و بازارهای هفتگی. (داده نمونه.)"
+  },
+  {
+    "id": "AY-04", "nameFa": "نیلوفران", "nameEn": "Nilufaran", "color": "#6f8a7c", "textTone": "light",
+    "population": 3980000, "cities": 12, "sample": true,
+    "capital": { "nameFa": "آب‌دشت", "nameEn": "Abdasht", "lon": 47.57, "lat": 33.55 },
+    "description": "ناحیه غربی با رودخانه‌های فراوان و دشت‌های حاصلخیز، معروف به انبار غله جمهوری. (داده نمونه.)"
+  },
+  {
+    "id": "AY-05", "nameFa": "مهرگان", "nameEn": "Mehregan", "color": "#14604a", "textTone": "light",
+    "population": 9150000, "cities": 28, "sample": true,
+    "capital": { "nameFa": "مهرشهر", "nameEn": "Mehrshahr", "lon": 52.61, "lat": 33.08 },
+    "description": "قلب پرجمعیت و صنعتی کشور؛ مرکز دانشگاه‌ها، رسانه‌ها و نهادهای اداری. (داده نمونه.)"
+  },
+  {
+    "id": "AY-06", "nameFa": "شقایق", "nameEn": "Shaghayegh", "color": "#d24a58", "textTone": "light",
+    "population": 2870000, "cities": 9, "sample": true,
+    "capital": { "nameFa": "شقایق‌آباد", "nameEn": "Shaghayeghabad", "lon": 58.46, "lat": 32.76 },
+    "description": "ناحیه شرقی با آسمان باز، باغ‌های زعفران و جشنواره‌های بهاری. (داده نمونه.)"
+  },
+  {
+    "id": "AY-07", "nameFa": "نخلستان", "nameEn": "Nakhlestan", "color": "#e4ebe6", "textTone": "dark",
+    "population": 4560000, "cities": 15, "sample": true,
+    "capital": { "nameFa": "نخل‌بندر", "nameEn": "Nakhlbandar", "lon": 52.19, "lat": 29.56 },
+    "description": "ناحیه جنوبی با نخلستان‌ها، بندرها و آب‌وهوای گرم؛ دروازه تجارت دریایی. (داده نمونه.)"
+  },
+  {
+    "id": "AY-08", "nameFa": "ماسه‌زار", "nameEn": "Masezar", "color": "#8f2b3a", "textTone": "light",
+    "population": 1640000, "cities": 7, "sample": true,
+    "capital": { "nameFa": "سنگ‌آباد", "nameEn": "Sangabad", "lon": 58.17, "lat": 27.94 },
+    "description": "پهناورترین و کم‌جمعیت‌ترین ناحیه در جنوب‌شرق، با بیابان‌های وسیع و شب‌های پرستاره. (داده نمونه.)"
+  }
+]

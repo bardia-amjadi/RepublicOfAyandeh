@@ -1,0 +1,32 @@
+{
+  "name": "republic-of-ayandeh",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Republic of Ayandeh (جمهوری آینده) — fictional political atlas and portal",
+  "scripts": {
+    "dev": "vite",
+    "validate": "node scripts/validate-content.mjs",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run validate && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "smoke": "node scripts/smoke-test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fontsource-variable/vazirmatn": "^5.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
+  }
+}

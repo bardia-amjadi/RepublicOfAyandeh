@@ -1,0 +1,5 @@
+[
+  { "id": "ig1", "image": "assets/instagram/post-1.svg", "alt": "پست نمونه اینستاگرام ۱", "caption": "پست نمونه؛ با تصویر و توضیح دستی جایگزین شود." },
+  { "id": "ig2", "image": "assets/instagram/post-2.svg", "alt": "پست نمونه اینستاگرام ۲", "caption": "پست نمونه دوم." },
+  { "id": "ig3", "image": "assets/instagram/post-3.svg", "alt": "پست نمونه اینستاگرام ۳", "caption": "پست نمونه سوم." }
+]

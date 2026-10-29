@@ -1,0 +1,8 @@
+[
+  { "id": "m1", "src": "assets/media/media-1.svg", "alt": "میم نمونه ۱", "title": "میم نمونه ۱", "caption": "توضیح کوتاه اختیاری برای تصویر.", "category": "میم" },
+  { "id": "m2", "src": "assets/media/media-2.svg", "alt": "پوستر نمونه ۲", "title": "پوستر نمونه ۲", "category": "پوستر" },
+  { "id": "m3", "src": "assets/media/media-3.svg", "alt": "میم نمونه ۳", "title": "میم نمونه ۳", "category": "میم" },
+  { "id": "m4", "src": "assets/media/media-4.svg", "alt": "تصویر نقشه نمونه ۴", "title": "نقشه نمونه ۴", "caption": "نمونه‌ای از تصویر افقی.", "category": "نقشه" },
+  { "id": "m5", "src": "assets/media/media-5.svg", "alt": "پوستر نمونه ۵", "title": "پوستر نمونه ۵", "category": "پوستر" },
+  { "id": "m6", "src": "assets/media/media-6.svg", "alt": "میم نمونه ۶", "title": "میم نمونه ۶", "category": "میم" }
+]
